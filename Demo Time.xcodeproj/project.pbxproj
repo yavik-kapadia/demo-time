@@ -8,6 +8,8 @@
 
 /* Begin PBXFileReference section */
 		E8B72AC22F54E867006872B5 /* Demo Time.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Demo Time.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8B72AC52F54E868006872B5 /* Demo TimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Demo TimeTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8B72AC62F54E868006872B5 /* Demo TimeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Demo TimeUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +18,51 @@
 			path = "Demo Time";
 			sourceTree = "<group>";
 		};
+		E8B72AC72F54E868006872B5 /* Demo TimeTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Demo TimeTests";
+			sourceTree = "<group>";
+		};
+		E8B72AC82F54E868006872B5 /* Demo TimeUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Demo TimeUITests";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		E8B72AC92F54E868006872B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8B72ABA2F54E867006872B5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8B72AC12F54E867006872B5;
+			remoteInfo = "Demo Time";
+		};
+		E8B72ACA2F54E868006872B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8B72ABA2F54E867006872B5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8B72AC12F54E867006872B5;
+			remoteInfo = "Demo Time";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		E8B72ABF2F54E867006872B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8B72ACB2F54E868006872B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8B72ACC2F54E868006872B5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +76,8 @@
 			isa = PBXGroup;
 			children = (
 				E8B72AC42F54E867006872B5 /* Demo Time */,
+				E8B72AC72F54E868006872B5 /* Demo TimeTests */,
+				E8B72AC82F54E868006872B5 /* Demo TimeUITests */,
 				E8B72AC32F54E867006872B5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +86,8 @@
 			isa = PBXGroup;
 			children = (
 				E8B72AC22F54E867006872B5 /* Demo Time.app */,
+				E8B72AC52F54E868006872B5 /* Demo TimeTests.xctest */,
+				E8B72AC62F54E868006872B5 /* Demo TimeUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -69,6 +116,52 @@
 			productName = "Demo Time";
 			productReference = E8B72AC22F54E867006872B5 /* Demo Time.app */;
 			productType = "com.apple.product-type.application";
+		};
+		E8B72ACD2F54E868006872B5 /* Demo TimeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8B72AD22F54E868006872B5 /* Build configuration list for PBXNativeTarget "Demo TimeTests" */;
+			buildPhases = (
+				E8B72ACE2F54E868006872B5 /* Sources */,
+				E8B72ACB2F54E868006872B5 /* Frameworks */,
+				E8B72ACF2F54E868006872B5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8B72AD02F54E868006872B5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E8B72AC72F54E868006872B5 /* Demo TimeTests */,
+			);
+			name = "Demo TimeTests";
+			packageProductDependencies = (
+			);
+			productName = "Demo TimeTests";
+			productReference = E8B72AC52F54E868006872B5 /* Demo TimeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E8B72AD12F54E868006872B5 /* Demo TimeUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8B72AD52F54E868006872B5 /* Build configuration list for PBXNativeTarget "Demo TimeUITests" */;
+			buildPhases = (
+				E8B72AD32F54E868006872B5 /* Sources */,
+				E8B72ACC2F54E868006872B5 /* Frameworks */,
+				E8B72AD42F54E868006872B5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8B72AD62F54E868006872B5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E8B72AC82F54E868006872B5 /* Demo TimeUITests */,
+			);
+			name = "Demo TimeUITests";
+			packageProductDependencies = (
+			);
+			productName = "Demo TimeUITests";
+			productReference = E8B72AC62F54E868006872B5 /* Demo TimeUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -100,12 +193,28 @@
 			projectRoot = "";
 			targets = (
 				E8B72AC12F54E867006872B5 /* Demo Time */,
+				E8B72ACD2F54E868006872B5 /* Demo TimeTests */,
+				E8B72AD12F54E868006872B5 /* Demo TimeUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E8B72AC02F54E867006872B5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8B72ACF2F54E868006872B5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8B72AD42F54E868006872B5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +231,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E8B72ACE2F54E868006872B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8B72AD32F54E868006872B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E8B72AD02F54E868006872B5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8B72AC12F54E867006872B5 /* Demo Time */;
+			targetProxy = E8B72AC92F54E868006872B5 /* PBXContainerItemProxy */;
+		};
+		E8B72AD62F54E868006872B5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8B72AC12F54E867006872B5 /* Demo Time */;
+			targetProxy = E8B72ACA2F54E868006872B5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E8B72ACB2F54E867006872B5 /* Debug */ = {
@@ -250,6 +386,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Demo Time/Demo_Time.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -259,6 +396,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Demo Time needs camera access to show video from your camera or capture card.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -282,6 +420,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Demo Time/Demo_Time.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -291,6 +430,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Demo Time needs camera access to show video from your camera or capture card.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -305,6 +445,74 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E8B72AD72F54E868006872B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ADDSZMFEX9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yavik.Demo-TimeTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Demo Time.app/Contents/MacOS/Demo Time";
+			};
+			name = Debug;
+		};
+		E8B72AD82F54E868006872B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ADDSZMFEX9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yavik.Demo-TimeTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Demo Time.app/Contents/MacOS/Demo Time";
+			};
+			name = Release;
+		};
+		E8B72AD92F54E868006872B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ADDSZMFEX9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yavik.Demo-TimeUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E8B72ADA2F54E868006872B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ADDSZMFEX9;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yavik.Demo-TimeUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -326,6 +534,24 @@
 			buildConfigurations = (
 				E8B72ACE2F54E867006872B5 /* Debug */,
 				E8B72ACF2F54E867006872B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8B72AD22F54E868006872B5 /* Build configuration list for PBXNativeTarget "Demo TimeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8B72AD72F54E868006872B5 /* Debug */,
+				E8B72AD82F54E868006872B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8B72AD52F54E868006872B5 /* Build configuration list for PBXNativeTarget "Demo TimeUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8B72AD92F54E868006872B5 /* Debug */,
+				E8B72ADA2F54E868006872B5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

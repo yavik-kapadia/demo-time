@@ -1,0 +1,31 @@
+{
+  "configurations" : [
+    {
+      "id" : "A1B2C3D4-0000-0000-0000-000000000001",
+      "name" : "Configuration 1",
+      "options" : {}
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Demo Time.xcodeproj",
+        "identifier" : "E8B72ACD2F54E868006872B5",
+        "name" : "Demo TimeTests"
+      }
+    },
+    {
+      "parallelizable" : false,
+      "target" : {
+        "containerPath" : "container:Demo Time.xcodeproj",
+        "identifier" : "E8B72AD12F54E868006872B5",
+        "name" : "Demo TimeUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

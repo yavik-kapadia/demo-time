@@ -1,0 +1,116 @@
+# Build, sign, notarize, and release Demo Time for macOS.
+# Triggers: push tag v* (e.g. v1.0.0) or manual "Release" workflow_dispatch.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.0.0); used for tag if no tag pushed'
+        required: false
+
+env:
+  SCHEME: "Demo Time"
+  CONFIGURATION: Release
+  APP_NAME: "Demo Time.app"
+
+jobs:
+  build-notarize-release:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up keychain and certificate
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          if [ -z "$BUILD_CERTIFICATE_BASE64" ]; then
+            echo "BUILD_CERTIFICATE_BASE64 is not set; skipping certificate import (build may still succeed with default signing)"
+            exit 0
+          fi
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security import $CERTIFICATE_PATH -k $KEYCHAIN_PATH -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/productbuild
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+      - name: Select Xcode
+        run: |
+          if [ -d /Applications/Xcode_15.4.app ]; then
+            sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          else
+            sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          fi
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Build
+        run: |
+          xcodebuild -scheme "${{ env.SCHEME }}" -configuration ${{ env.CONFIGURATION }} -derivedDataPath build clean build
+        env:
+          CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY || 'Developer ID Application' }}
+
+      - name: Locate app
+        id: app
+        run: |
+          APP_PATH=$(find build/Build/Products/${{ env.CONFIGURATION }} -name "${{ env.APP_NAME }}" -type d 2>/dev/null | head -1)
+          if [ -z "$APP_PATH" ] || [ ! -d "$APP_PATH" ]; then
+            echo "App not found in build/"; exit 1
+          fi
+          echo "path=$APP_PATH" >> $GITHUB_OUTPUT
+
+      - name: Create zip for notarization
+        run: |
+          ditto -c -k --keepParent "${{ steps.app.outputs.path }}" DemoTime.zip
+
+      - name: Notarize
+        id: notarize
+        if: secrets.APPLE_ID != '' && secrets.APPLE_APP_SPECIFIC_PASSWORD != ''
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$APPLE_TEAM_ID" ]; then
+            xcrun notarytool submit DemoTime.zip --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
+          else
+            xcrun notarytool submit DemoTime.zip --apple-id "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD" --wait
+          fi
+          xcrun stapler staple "${{ steps.app.outputs.path }}"
+          echo "notarized=true" >> $GITHUB_OUTPUT
+
+      - name: Create distribution zip
+        run: |
+          ditto -c -k --keepParent "${{ steps.app.outputs.path }}" DemoTime-notarized.zip
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${{ github.event.inputs.version || '0.0.0' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        if: success() && (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch')
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Demo Time v${{ steps.version.outputs.version }}
+          draft: false
+          generate_release_notes: true
+          files: DemoTime-notarized.zip
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
