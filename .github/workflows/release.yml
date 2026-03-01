@@ -76,7 +76,7 @@ jobs:
         run: |
           IDENTITY="${CODE_SIGN_IDENTITY:-Developer ID Application}"
           TEAM="${APPLE_TEAM_ID:-ADDSZMFEX9}"
-          xcodebuild -project "Demo Time.xcodeproj" -target "Demo Time" -configuration ${{ env.CONFIGURATION }} clean build \
+          xcodebuild -project "Demo Time.xcodeproj" -target "Demo Time" -configuration ${{ env.CONFIGURATION }} -derivedDataPath "$GITHUB_WORKSPACE/build" clean build \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$IDENTITY" \
             DEVELOPMENT_TEAM="$TEAM"
@@ -84,11 +84,14 @@ jobs:
       - name: Locate app
         id: app
         run: |
-          APP_PATH=$(find "$HOME/Library/Developer/Xcode/DerivedData" -name "${{ env.APP_NAME }}" -type d 2>/dev/null | head -1)
+          RELEASE_DIR=$(find "$HOME/Library/Developer/Xcode/DerivedData" -type d -path "*/Build/Products/Release" 2>/dev/null | head -1)
+          if [ -n "$RELEASE_DIR" ] && [ -d "$RELEASE_DIR/${{ env.APP_NAME }}" ]; then
+            APP_PATH="$RELEASE_DIR/${{ env.APP_NAME }}"
+          else
+            APP_PATH=$(find "$GITHUB_WORKSPACE/build" "$HOME/Library/Developer/Xcode/DerivedData" -name "${{ env.APP_NAME }}" -type d 2>/dev/null | head -1)
+          fi
           if [ -z "$APP_PATH" ] || [ ! -d "$APP_PATH" ]; then
-            echo "App not found in DerivedData. Contents:"
-            ls -la "$HOME/Library/Developer/Xcode/DerivedData" 2>/dev/null || true
-            find "$HOME/Library/Developer/Xcode/DerivedData" -name "*.app" -type d 2>/dev/null | head -5
+            echo "App not found."
             exit 1
           fi
           echo "path=$APP_PATH" >> $GITHUB_OUTPUT
