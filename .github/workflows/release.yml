@@ -20,7 +20,8 @@ env:
 
 jobs:
   build-notarize-release:
-    runs-on: macos-14
+    if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+    runs-on: macos-latest
     permissions:
       contents: write
     steps:
