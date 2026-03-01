@@ -76,7 +76,7 @@ jobs:
         run: |
           IDENTITY="${CODE_SIGN_IDENTITY:-Developer ID Application}"
           TEAM="${APPLE_TEAM_ID:-ADDSZMFEX9}"
-          xcodebuild -project "Demo Time.xcodeproj" -target "Demo Time" -configuration ${{ env.CONFIGURATION }} -derivedDataPath "$GITHUB_WORKSPACE/build" clean build \
+          xcodebuild -project "Demo Time.xcodeproj" -target "Demo Time" -configuration ${{ env.CONFIGURATION }} clean build \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$IDENTITY" \
             DEVELOPMENT_TEAM="$TEAM"
