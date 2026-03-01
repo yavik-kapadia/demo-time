@@ -79,6 +79,7 @@ jobs:
           xcodebuild -project "Demo Time.xcodeproj" -target "Demo Time" -configuration ${{ env.CONFIGURATION }} clean build \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$IDENTITY" \
+            CODE_SIGN_TIMESTAMP=YES \
             DEVELOPMENT_TEAM="$TEAM"
 
       - name: Locate app
