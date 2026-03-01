@@ -70,11 +70,16 @@ jobs:
         run: xcodebuild -version
 
       - name: Build
+        env:
+          CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          IDENTITY="${CODE_SIGN_IDENTITY:-Developer ID Application}"
+          TEAM="${APPLE_TEAM_ID:-ADDSZMFEX9}"
           xcodebuild -project "Demo Time.xcodeproj" -target "Demo Time" -configuration ${{ env.CONFIGURATION }} clean build \
             CODE_SIGN_STYLE=Manual \
-            CODE_SIGN_IDENTITY="${{ secrets.CODE_SIGN_IDENTITY || 'Developer ID Application' }}" \
-            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID || 'ADDSZMFEX9' }}"
+            CODE_SIGN_IDENTITY="$IDENTITY" \
+            DEVELOPMENT_TEAM="$TEAM"
 
       - name: Locate app
         id: app
