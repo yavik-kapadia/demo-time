@@ -102,9 +102,12 @@ jobs:
           CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}
         run: |
           IDENTITY="${CODE_SIGN_IDENTITY:-Developer ID Application}"
-          /usr/bin/codesign --force --sign "$IDENTITY" --timestamp --options runtime "${{ steps.app.outputs.path }}"
+          ENTITLEMENTS="Demo Time/Demo_Time.entitlements"
+          /usr/bin/codesign --force --sign "$IDENTITY" --timestamp --options runtime --entitlements "$ENTITLEMENTS" "${{ steps.app.outputs.path }}"
           echo "Verifying signature:"
           codesign -dvv "${{ steps.app.outputs.path }}" 2>&1 | grep -E "Signature|Authority|Timestamp|Flags"
+          echo "Entitlements:"
+          codesign -d --entitlements - "${{ steps.app.outputs.path }}" 2>&1
 
       - name: Create zip for notarization
         run: |
