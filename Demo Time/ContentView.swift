@@ -22,6 +22,75 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
+            switch cameraManager.authStatus {
+            case .notDetermined:
+                permissionRequestView
+            case .denied, .restricted:
+                permissionDeniedView
+            case .authorized:
+                cameraView
+            }
+        }
+        .onAppear {
+            if cameraManager.authStatus == .authorized {
+                cameraManager.configureSession()
+                cameraManager.startSession()
+            }
+            observeFullscreen()
+        }
+        .onDisappear {
+            cameraManager.stopSession()
+        }
+    }
+
+    private var permissionRequestView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "video.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.secondary)
+            Text("Camera Access Required")
+                .font(.title2.weight(.medium))
+            Text("Demo Time needs access to your camera or capture card to display video.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 360)
+            Button("Allow Camera Access") {
+                cameraManager.requestAccess()
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(nsColor: .windowBackgroundColor))
+    }
+
+    private var permissionDeniedView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "video.slash.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(.secondary)
+            Text("Camera Access Denied")
+                .font(.title2.weight(.medium))
+            Text("Open System Settings to grant camera access to Demo Time.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 360)
+            Button("Open System Settings") {
+                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(nsColor: .windowBackgroundColor))
+    }
+
+    private var cameraView: some View {
+        ZStack(alignment: .bottom) {
             CameraPreview(
                 session: cameraManager.session,
                 rotationDegrees: rotationDegrees,
@@ -33,16 +102,34 @@ struct ContentView: View {
             .ignoresSafeArea()
 
             if let message = cameraManager.errorMessage {
-                VStack {
+                VStack(spacing: 12) {
                     Text(message)
-                        .font(.caption)
+                        .font(.callout)
                         .foregroundStyle(.white)
-                        .padding(8)
-                        .background(.black.opacity(0.7))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .multilineTextAlignment(.center)
+                        .padding(12)
+                        .frame(maxWidth: 400)
+                        .background(.black.opacity(0.8))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    HStack(spacing: 12) {
+                        Button("Retry") {
+                            cameraManager.discoverDevices()
+                            cameraManager.configureSession()
+                            cameraManager.startSession()
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        Button("Open System Settings") {
+                            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera") {
+                                NSWorkspace.shared.open(url)
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                    }
                     Spacer()
                 }
-                .padding()
+                .padding(.top, 40)
             }
 
             if isHovering {
@@ -50,14 +137,6 @@ struct ContentView: View {
             }
         }
         .onHover { isHovering = $0 }
-        .onAppear {
-            cameraManager.configureSession()
-            cameraManager.startSession()
-            observeFullscreen()
-        }
-        .onDisappear {
-            cameraManager.stopSession()
-        }
     }
 
     private var controlsOverlay: some View {

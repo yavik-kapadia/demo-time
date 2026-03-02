@@ -9,17 +9,57 @@ import AVFoundation
 import Combine
 import SwiftUI
 
+enum CameraAuthStatus {
+    case notDetermined
+    case authorized
+    case denied
+    case restricted
+}
+
 @MainActor
 final class CameraManager: ObservableObject {
     @Published var availableDevices: [AVCaptureDevice] = []
     @Published var selectedDevice: AVCaptureDevice?
     @Published var session = AVCaptureSession()
     @Published var errorMessage: String?
+    @Published var authStatus: CameraAuthStatus = .notDetermined
 
     private let sessionQueue = DispatchQueue(label: "com.yavik.Demo-Time.capture-session")
 
     init() {
-        discoverDevices()
+        checkAuthorizationStatus()
+    }
+
+    func checkAuthorizationStatus() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            authStatus = .authorized
+            discoverDevices()
+        case .notDetermined:
+            authStatus = .notDetermined
+        case .denied:
+            authStatus = .denied
+        case .restricted:
+            authStatus = .restricted
+        @unknown default:
+            authStatus = .denied
+        }
+    }
+
+    func requestAccess() {
+        AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+            Task { @MainActor in
+                guard let self else { return }
+                if granted {
+                    self.authStatus = .authorized
+                    self.discoverDevices()
+                    self.configureSession()
+                    self.startSession()
+                } else {
+                    self.authStatus = .denied
+                }
+            }
+        }
     }
 
     func discoverDevices() {
@@ -57,10 +97,25 @@ final class CameraManager: ObservableObject {
                     self.session.addInput(input)
                     Task { @MainActor in self.errorMessage = nil }
                 } else {
-                    Task { @MainActor in self.errorMessage = "Cannot add this camera." }
+                    Task { @MainActor in
+                        self.errorMessage = "Cannot use \(device.localizedName). It may be in use by another app. Close other apps using the camera and try again."
+                    }
                 }
-            } catch {
-                Task { @MainActor in self.errorMessage = error.localizedDescription }
+            } catch let error as NSError {
+                let deviceName = device.localizedName
+                let msg: String
+                if error.domain == AVFoundationErrorDomain {
+                    switch error.code {
+                    case AVError.applicationIsNotAuthorizedToUseDevice.rawValue:
+                        msg = "Camera access was denied. Open System Settings → Privacy & Security → Camera and enable Demo Time."
+                        Task { @MainActor in self.authStatus = .denied }
+                    default:
+                        msg = "Cannot use \(deviceName). It may be in use by another app, or try a different camera."
+                    }
+                } else {
+                    msg = "Cannot use \(deviceName): \(error.localizedDescription)"
+                }
+                Task { @MainActor in self.errorMessage = msg }
             }
 
             self.session.commitConfiguration()

@@ -60,3 +60,9 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# Signing certificates (private keys — never commit)
+*.p12
+
+# Local build output
+build/
