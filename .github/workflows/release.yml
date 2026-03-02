@@ -79,8 +79,7 @@ jobs:
           xcodebuild -project "Demo Time.xcodeproj" -target "Demo Time" -configuration ${{ env.CONFIGURATION }} clean build \
             CODE_SIGN_STYLE=Manual \
             CODE_SIGN_IDENTITY="$IDENTITY" \
-            CODE_SIGN_TIMESTAMP=YES \
-            OTHER_CODE_SIGN_FLAGS="--timestamp" \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
             DEVELOPMENT_TEAM="$TEAM"
 
       - name: Locate app
@@ -97,6 +96,15 @@ jobs:
             exit 1
           fi
           echo "path=$APP_PATH" >> $GITHUB_OUTPUT
+
+      - name: Re-sign for distribution
+        env:
+          CODE_SIGN_IDENTITY: ${{ secrets.CODE_SIGN_IDENTITY }}
+        run: |
+          IDENTITY="${CODE_SIGN_IDENTITY:-Developer ID Application}"
+          /usr/bin/codesign --force --sign "$IDENTITY" --timestamp --options runtime "${{ steps.app.outputs.path }}"
+          echo "Verifying signature:"
+          codesign -dvv "${{ steps.app.outputs.path }}" 2>&1 | grep -E "Signature|Authority|Timestamp|Flags"
 
       - name: Create zip for notarization
         run: |
