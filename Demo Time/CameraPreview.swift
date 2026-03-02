@@ -19,79 +19,97 @@ struct CameraPreview: NSViewRepresentable {
 
     func makeNSView(context: Context) -> CameraPreviewNSView {
         let view = CameraPreviewNSView()
-        view.previewLayer.session = session
-        view.previewLayer.videoGravity = .resizeAspect
-        view.previewLayer.connection?.automaticallyAdjustsVideoMirroring = false
+        view.session = session
         return view
     }
 
     func updateNSView(_ nsView: CameraPreviewNSView, context: Context) {
-        nsView.previewLayer.session = session
-        nsView.updateRotation(rotationDegrees)
-        nsView.updateCrop(top: cropTop, bottom: cropBottom, left: cropLeft, right: cropRight)
+        nsView.session = session
+        nsView.rotationDegrees = rotationDegrees
+        nsView.cropValues = (cropTop, cropBottom, cropLeft, cropRight)
+        nsView.applySettings()
     }
 }
 
 final class CameraPreviewNSView: NSView {
-    override func makeBackingLayer() -> CALayer {
-        AVCaptureVideoPreviewLayer()
+    private let previewLayer = AVCaptureVideoPreviewLayer()
+    var session: AVCaptureSession? {
+        didSet { previewLayer.session = session }
     }
-    var previewLayer: AVCaptureVideoPreviewLayer { layer as! AVCaptureVideoPreviewLayer }
-
-    private var currentRotation: Double = 0
-    private var cropTop: Double = 0, cropBottom: Double = 0, cropLeft: Double = 0, cropRight: Double = 0
+    var rotationDegrees: Double = 0
+    var cropValues: (top: Double, bottom: Double, left: Double, right: Double) = (0, 0, 0, 0)
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
-        wantsLayer = true
+        setup()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+        setup()
+    }
+
+    private func setup() {
         wantsLayer = true
+        layer?.backgroundColor = NSColor.black.cgColor
+        previewLayer.backgroundColor = .clear
+        layer?.addSublayer(previewLayer)
+        previewLayer.videoGravity = .resizeAspect
+        previewLayer.connection?.automaticallyAdjustsVideoMirroring = false
     }
 
     override func layout() {
         super.layout()
-        // Keep layer centered for rotation; updateRotation sets bounds, position, and transform
-        previewLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        previewLayer.position = CGPoint(x: bounds.midX, y: bounds.midY)
-        previewLayer.bounds = CGRect(origin: .zero, size: bounds.size)
-        updateRotation(currentRotation)
-        updateCrop(top: cropTop, bottom: cropBottom, left: cropLeft, right: cropRight)
+        applySettings()
     }
 
-    func updateRotation(_ degrees: Double) {
-        currentRotation = degrees
-        let radians = CGFloat(degrees * .pi / 180)
-        let w = bounds.width
-        let h = bounds.height
-        guard w > 0, h > 0 else {
-            previewLayer.setAffineTransform(CGAffineTransform(rotationAngle: radians))
-            return
-        }
-        // For 90° and 270°, scale the layer so that after rotation it still fills the view.
-        // Otherwise the rotated layer extends outside the bounds and the preview looks empty.
-        let scale: CGFloat
-        if degrees == 90 || degrees == 270 {
-            scale = max(w, h) / min(w, h)
-        } else {
-            scale = 1
-        }
-        let transform = CGAffineTransform(scaleX: scale, y: scale)
-            .concatenating(CGAffineTransform(rotationAngle: radians))
-        previewLayer.setAffineTransform(transform)
+    func applySettings() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+
+        applyRotation()
+        applyCrop()
+
+        CATransaction.commit()
     }
 
-    func updateCrop(top: Double, bottom: Double, left: Double, right: Double) {
-        cropTop = top
-        cropBottom = bottom
-        cropLeft = left
-        cropRight = right
-
+    private func applyRotation() {
         let w = bounds.width
         let h = bounds.height
         guard w > 0, h > 0 else { return }
+
+        if let connection = previewLayer.connection,
+           connection.isVideoRotationAngleSupported(CGFloat(rotationDegrees)) {
+            connection.videoRotationAngle = CGFloat(rotationDegrees)
+            previewLayer.frame = bounds
+        } else {
+            previewLayer.frame = bounds
+            previewLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            previewLayer.position = CGPoint(x: w / 2, y: h / 2)
+
+            let radians = CGFloat(rotationDegrees * .pi / 180)
+            var transform = CATransform3DIdentity
+            transform = CATransform3DRotate(transform, radians, 0, 0, 1)
+
+            if rotationDegrees == 90 || rotationDegrees == 270 {
+                let scale = max(w, h) / min(w, h)
+                transform = CATransform3DScale(transform, scale, scale, 1)
+            }
+
+            previewLayer.transform = transform
+        }
+    }
+
+    private func applyCrop() {
+        let w = bounds.width
+        let h = bounds.height
+        guard w > 0, h > 0 else { return }
+
+        let (top, bottom, left, right) = cropValues
+        if top == 0, bottom == 0, left == 0, right == 0 {
+            previewLayer.mask = nil
+            return
+        }
 
         let leftInset = w * CGFloat(left / 100)
         let rightInset = w * CGFloat(right / 100)
@@ -104,10 +122,10 @@ final class CameraPreviewNSView: NSView {
             width: max(0, w - leftInset - rightInset),
             height: max(0, h - topInset - bottomInset)
         )
-        let path = CGPath(rect: cropRect, transform: nil)
+
         let maskLayer = CAShapeLayer()
-        maskLayer.path = path
-        maskLayer.frame = bounds
+        maskLayer.path = CGPath(rect: cropRect, transform: nil)
+        maskLayer.frame = CGRect(origin: .zero, size: bounds.size)
         previewLayer.mask = maskLayer
     }
 }
