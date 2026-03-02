@@ -41,6 +41,13 @@ struct ContentView: View {
         .onDisappear {
             cameraManager.stopSession()
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            cameraManager.checkAuthorizationStatus()
+            if cameraManager.authStatus == .authorized {
+                cameraManager.configureSession()
+                cameraManager.startSession()
+            }
+        }
     }
 
     private var permissionRequestView: some View {

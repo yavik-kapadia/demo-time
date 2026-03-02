@@ -101,20 +101,9 @@ final class CameraManager: ObservableObject {
                         self.errorMessage = "Cannot use \(device.localizedName). It may be in use by another app. Close other apps using the camera and try again."
                     }
                 }
-            } catch let error as NSError {
+            } catch {
                 let deviceName = device.localizedName
-                let msg: String
-                if error.domain == AVFoundationErrorDomain {
-                    switch error.code {
-                    case AVError.applicationIsNotAuthorizedToUseDevice.rawValue:
-                        msg = "Camera access was denied. Open System Settings → Privacy & Security → Camera and enable Demo Time."
-                        Task { @MainActor in self.authStatus = .denied }
-                    default:
-                        msg = "Cannot use \(deviceName). It may be in use by another app, or try a different camera."
-                    }
-                } else {
-                    msg = "Cannot use \(deviceName): \(error.localizedDescription)"
-                }
+                let msg = "Cannot use \(deviceName). It may be in use by another app, or try a different camera."
                 Task { @MainActor in self.errorMessage = msg }
             }
 
