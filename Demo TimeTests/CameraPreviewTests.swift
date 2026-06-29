@@ -65,4 +65,29 @@ final class CameraPreviewTests: XCTestCase {
         let view = CameraPreviewNSView(frame: .zero)
         view.updateCrop(top: 0, bottom: 0, left: 0, right: 0)
     }
+
+    func testCropAppliesZoomTransform() {
+        let view = CameraPreviewNSView(frame: NSRect(x: 0, y: 0, width: 200, height: 200))
+        view.layout()
+        view.updateCrop(top: 10, bottom: 10, left: 10, right: 10)
+        let t = view.previewLayer.transform
+        XCTAssertGreaterThan(t.m11, 1.0)            // x-scale zoomed in
+        XCTAssertEqual(t.m11, t.m22, accuracy: 1e-6) // uniform (no distortion)
+        XCTAssertFalse(CATransform3DIsIdentity(t))
+        XCTAssertNil(view.previewLayer.mask)         // zoom replaces the old mask
+    }
+
+    func testZeroCropIsIdentity() {
+        let view = CameraPreviewNSView(frame: NSRect(x: 0, y: 0, width: 200, height: 200))
+        view.layout()
+        view.updateCrop(top: 0, bottom: 0, left: 0, right: 0)
+        XCTAssertTrue(CATransform3DIsIdentity(view.previewLayer.transform))
+    }
+
+    func testAsymmetricCropRecenters() {
+        let view = CameraPreviewNSView(frame: NSRect(x: 0, y: 0, width: 200, height: 200))
+        view.layout()
+        view.updateCrop(top: 0, bottom: 0, left: 20, right: 0)
+        XCTAssertNotEqual(view.previewLayer.transform.m41, 0.0, accuracy: 1e-6)
+    }
 }
